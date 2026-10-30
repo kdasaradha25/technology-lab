@@ -1,0 +1,78 @@
+<main class="page">
+  <header class="page-header">
+    <h1>Backend &amp; Database Health Monitor</h1>
+    <p>Select a Technology Lab backend and check its API, application and database health.</p>
+  </header>
+
+  <section class="panel" aria-labelledby="backend-heading">
+    <h2 id="backend-heading">Backend configuration</h2>
+    <div class="fields">
+      <label class="field">
+        <span>Sample configuration</span>
+        <select (change)="selectPreset($any($event.target).value)">
+          @for (preset of presets; track preset.name) {
+            <option [value]="preset.name" [selected]="preset.name === selectedPreset()">{{ preset.name }}</option>
+          }
+          <option value="" disabled [selected]="!selectedPreset()">Custom URL</option>
+        </select>
+      </label>
+      <label class="field grow">
+        <span>Backend API URL</span>
+        <input
+          type="url"
+          inputmode="url"
+          autocomplete="off"
+          spellcheck="false"
+          placeholder="http://localhost:8001"
+          [value]="baseUrl()"
+          (input)="setBaseUrl($any($event.target).value)"
+        />
+      </label>
+    </div>
+    <p class="hint">Sample URLs are suggestions only; the matching backend must be running for checks to succeed.</p>
+  </section>
+
+  <section class="panel" aria-label="Health checks">
+    <div class="actions">
+      @for (check of checks; track check.kind) {
+        <button type="button" (click)="run([check.kind])" [disabled]="loading().has(check.kind)">
+          {{ check.buttonLabel }}
+        </button>
+      }
+      <button type="button" class="primary" (click)="runAll()" [disabled]="busy()">Check All</button>
+      <span class="last-checked" aria-live="polite">
+        @if (busy()) {
+          Checking…
+        } @else if (lastChecked(); as checked) {
+          Last checked: {{ checked | date: 'mediumTime' }}
+        } @else {
+          Not checked yet
+        }
+      </span>
+    </div>
+  </section>
+
+  <section class="panel" aria-labelledby="summary-heading">
+    <h2 id="summary-heading">Summary</h2>
+    <dl class="summary">
+      <div><dt>Backend service name</dt><dd>{{ serviceName() ?? '—' }}</dd></div>
+      <div><dt>API status</dt><dd><app-status-badge [state]="stateOf('api')" /></dd></div>
+      <div><dt>Application status</dt><dd><app-status-badge [state]="stateOf('app')" /></dd></div>
+      <div><dt>Database status</dt><dd><app-status-badge [state]="databaseState()" /></dd></div>
+      <div><dt>Database type</dt><dd>{{ databaseType() ?? '—' }}</dd></div>
+    </dl>
+    @if (databases().length > 0) {
+      <ul class="databases" aria-label="Individual databases">
+        @for (db of databases(); track db.name) {
+          <li><span>{{ db.name }}</span> <app-status-badge [state]="db.state" /></li>
+        }
+      </ul>
+    }
+  </section>
+
+  <section aria-label="Results" class="cards">
+    @for (check of checks; track check.kind) {
+      <app-health-card [check]="check" [result]="results()[check.kind]" [loading]="loading().has(check.kind)" />
+    }
+  </section>
+</main>

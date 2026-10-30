@@ -1,0 +1,40 @@
+name: go-cassandra
+
+services:
+  cassandra:
+    image: cassandra:5.0
+    container_name: go-cassandra-db
+    environment:
+      CASSANDRA_CLUSTER_NAME: technology-lab
+      # Keep memory use modest for a single-node lab.
+      MAX_HEAP_SIZE: 512M
+      HEAP_NEWSIZE: 128M
+    ports:
+      - "${CASSANDRA_PORT:-9042}:9042"
+    volumes:
+      - cassandra_data:/var/lib/cassandra
+    healthcheck:
+      # Healthy only once the CQL port accepts real queries, not just when the JVM is up.
+      test: ["CMD-SHELL", "cqlsh -e 'SELECT release_version FROM system.local' || exit 1"]
+      interval: 10s
+      timeout: 10s
+      retries: 30
+      start_period: 60s
+
+  # Optional: run the API in a container too (`docker compose up -d --build`).
+  go:
+    build: .
+    container_name: go-cassandra-api
+    env_file: .env
+    environment:
+      CASSANDRA_HOSTS: cassandra
+      CASSANDRA_PORT: 9042
+    ports:
+      - "${PORT:-8004}:8004"
+    depends_on:
+      cassandra:
+        condition: service_healthy
+
+volumes:
+  cassandra_data:
+    name: go-cassandra_cassandra_data

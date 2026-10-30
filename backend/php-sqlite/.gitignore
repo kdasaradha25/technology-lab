@@ -1,0 +1,13 @@
+.env
+
+# Local SQLite database files (the directory itself is kept via .gitkeep)
+database/*
+!database/.gitkeep
+*.sqlite
+*.sqlite3
+*.db
+*.sqlite-journal
+*.sqlite-wal
+*.sqlite-shm
+
+*.log

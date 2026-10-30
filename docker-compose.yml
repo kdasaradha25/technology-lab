@@ -1,0 +1,26 @@
+name: technology-lab
+
+# Runs every backend, database and frontend in one stack:
+#   docker compose up -d --build
+#
+# Each project's own docker-compose.yml stays the source of truth. `include` loads it with that
+# project's directory and .env, so build contexts, env_file paths and ${VARS} resolve exactly as
+# they do when you run the project on its own. Service names are unique across all projects,
+# so you can target one: `docker compose logs -f django`, `docker compose stop postgres`.
+#
+# Volumes have fixed names, so this stack and the per-project stacks share the same data.
+# Run only one of them at a time: they use the same container names and host ports.
+
+include:
+  # Backends (each with its database)
+  - backend/django-postgres/docker-compose.yml               # django    :8001  postgres  :5433
+  - backend/fastapi-mysql/docker-compose.yml                 # fastapi   :8002  mysql     :3306
+  - backend/express-mongodb/docker-compose.yml               # express   :8003  mongo     :27017
+  - backend/go-cassandra/docker-compose.yml                  # go        :8004  cassandra :9042
+  - backend/php-sqlite/docker-compose.yml                    # php       :8005  (SQLite file)
+  - backend/python-stdlib-redis-influxdb/docker-compose.yml  # python    :8006  redis :6379, influxdb :8086
+
+  # Frontends
+  - frontend/react-app/docker-compose.yml                    # react     :5173
+  - frontend/nextjs-app/docker-compose.yml                   # nextjs    :3000
+  - frontend/angular-app/docker-compose.yml                  # angular   :4200

@@ -1,0 +1,21 @@
+name: nextjs-app
+
+services:
+  nextjs:
+    build:
+      context: .
+      # Values from .env (if present) are passed in; otherwise the Dockerfile defaults apply.
+      args:
+        NEXT_PUBLIC_DJANGO_URL: ${NEXT_PUBLIC_DJANGO_URL:-http://localhost:8001}
+        NEXT_PUBLIC_FASTAPI_URL: ${NEXT_PUBLIC_FASTAPI_URL:-http://localhost:8002}
+        NEXT_PUBLIC_EXPRESS_URL: ${NEXT_PUBLIC_EXPRESS_URL:-http://localhost:8003}
+        NEXT_PUBLIC_GO_URL: ${NEXT_PUBLIC_GO_URL:-http://localhost:8004}
+        NEXT_PUBLIC_PHP_URL: ${NEXT_PUBLIC_PHP_URL:-http://localhost:8005}
+        NEXT_PUBLIC_PYTHON_URL: ${NEXT_PUBLIC_PYTHON_URL:-http://localhost:8006}
+        NEXT_PUBLIC_REQUEST_TIMEOUT_MS: ${NEXT_PUBLIC_REQUEST_TIMEOUT_MS:-5000}
+    container_name: nextjs-health-monitor
+    # Lets `docker compose stop` shut the Node server down promptly.
+    init: true
+    ports:
+      # Must stay 3000 on the host: the backends only allow CORS from http://localhost:3000.
+      - "3000:3000"

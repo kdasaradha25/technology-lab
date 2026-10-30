@@ -1,0 +1,19 @@
+name: react-app
+
+services:
+  react:
+    build:
+      context: .
+      # Values from .env (if present) are passed in; otherwise the Dockerfile defaults apply.
+      args:
+        VITE_DJANGO_URL: ${VITE_DJANGO_URL:-http://localhost:8001}
+        VITE_FASTAPI_URL: ${VITE_FASTAPI_URL:-http://localhost:8002}
+        VITE_EXPRESS_URL: ${VITE_EXPRESS_URL:-http://localhost:8003}
+        VITE_GO_URL: ${VITE_GO_URL:-http://localhost:8004}
+        VITE_PHP_URL: ${VITE_PHP_URL:-http://localhost:8005}
+        VITE_PYTHON_URL: ${VITE_PYTHON_URL:-http://localhost:8006}
+        VITE_REQUEST_TIMEOUT_MS: ${VITE_REQUEST_TIMEOUT_MS:-5000}
+    container_name: react-health-monitor
+    ports:
+      # Must stay 5173 on the host: the backends only allow CORS from http://localhost:5173.
+      - "5173:80"

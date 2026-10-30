@@ -1,0 +1,2 @@
+redis==5.2.1
+influxdb-client==1.48.0

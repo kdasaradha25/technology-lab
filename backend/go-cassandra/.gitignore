@@ -1,0 +1,7 @@
+.env
+*.exe
+/go-cassandra
+/bin/
+*.log
+*.test
+coverage.out

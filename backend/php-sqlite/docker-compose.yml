@@ -1,0 +1,27 @@
+name: php-sqlite
+
+services:
+  php:
+    build: .
+    container_name: php-sqlite-api
+    # As PID 1, `php -S` ignores SIGTERM and gets force-killed on stop. A tiny init process
+    # forwards the signal so the server shuts down cleanly.
+    init: true
+    environment:
+      DB_PATH: ${DB_PATH:-database/app.sqlite}
+      DB_TIMEOUT: ${DB_TIMEOUT:-3}
+      CORS_ALLOWED_ORIGINS: ${CORS_ALLOWED_ORIGINS:-http://localhost:5173,http://localhost:3000,http://localhost:4200}
+    ports:
+      - "${PORT:-8005}:8005"
+    volumes:
+      # Keeps the SQLite file across container rebuilds.
+      - sqlite_data:/app/database
+    healthcheck:
+      test: ["CMD", "php", "-r", "exit(@file_get_contents('http://127.0.0.1:8005/health') === false ? 1 : 0);"]
+      interval: 10s
+      timeout: 3s
+      retries: 3
+
+volumes:
+  sqlite_data:
+    name: php-sqlite_sqlite_data

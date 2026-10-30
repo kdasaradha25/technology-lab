@@ -1,0 +1,99 @@
+:root {
+  --bg: #f5f6f8;
+  --panel: #ffffff;
+  --line: #dde1e6;
+  --text: #1a1d21;
+  --muted: #5c6672;
+  --accent: #c3002f;
+  --on-accent: #ffffff;
+
+  --ok: #17784a;
+  --ok-bg: #e5f4eb;
+  --err: #be1e2d;
+  --err-bg: #fcebec;
+  --warn: #8f5b00;
+  --warn-bg: #fdf2db;
+  --busy: #1d4ed8;
+  --busy-bg: #e8eefd;
+  --idle-bg: #eef0f3;
+
+  color-scheme: light dark;
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+}
+
+@media (prefers-color-scheme: dark) {
+  :root {
+    --bg: #101215;
+    --panel: #191c21;
+    --line: #2c3139;
+    --text: #e7e9ec;
+    --muted: #9ba4af;
+    --accent: #ff4d6d;
+    --on-accent: #101215;
+
+    --ok: #63d49c;
+    --ok-bg: #11291d;
+    --err: #ff8a92;
+    --err-bg: #361517;
+    --warn: #f0bf55;
+    --warn-bg: #30260f;
+    --busy: #8fb0ff;
+    --busy-bg: #172341;
+    --idle-bg: #23272d;
+  }
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+}
+
+code,
+pre {
+  font-family: ui-monospace, 'Cascadia Code', Consolas, monospace;
+}
+
+button,
+input,
+select {
+  font: inherit;
+  color: var(--text);
+}
+
+button {
+  padding: 8px 14px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+  font-weight: 500;
+  cursor: pointer;
+}
+
+button:hover:not(:disabled) {
+  border-color: var(--accent);
+}
+
+button:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}
+
+input,
+select {
+  width: 100%;
+  padding: 8px 10px;
+  border: 1px solid var(--line);
+  border-radius: 6px;
+  background: var(--panel);
+}
+
+:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
