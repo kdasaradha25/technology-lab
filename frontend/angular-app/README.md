@@ -91,7 +91,9 @@ npm run build        # production build into dist/angular-app/browser
 
 ## Configuration
 
-The sample URLs are in `src/app/backends.ts`, and any URL can be typed into the page. The request
+The sample URLs are in `src/app/backends.ts`, and any URL can be typed into the page. A build can
+override them with `--define`, which the Dockerfile does from its `NG_DJANGO_URL` … `NG_PYTHON_URL`
+build args (set them in `.env` next to `docker-compose.yml`, then rebuild). The request
 timeout (5000 ms) is the `HEALTH_REQUEST_TIMEOUT_MS` injection token in the same file. There are no
 secrets and no environment files: everything here is public configuration.
 

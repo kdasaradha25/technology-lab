@@ -1,0 +1,4 @@
+# Each project has its own .gitignore; this covers files at the repository root.
+/.env
+.DS_Store
+Thumbs.db

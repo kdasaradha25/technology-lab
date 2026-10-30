@@ -2,7 +2,16 @@ name: angular-app
 
 services:
   angular:
-    build: .
+    build:
+      context: .
+      # Values from .env (if present) are passed in; otherwise the Dockerfile defaults apply.
+      args:
+        NG_DJANGO_URL: ${NG_DJANGO_URL:-http://localhost:8001}
+        NG_FASTAPI_URL: ${NG_FASTAPI_URL:-http://localhost:8002}
+        NG_EXPRESS_URL: ${NG_EXPRESS_URL:-http://localhost:8003}
+        NG_GO_URL: ${NG_GO_URL:-http://localhost:8004}
+        NG_PHP_URL: ${NG_PHP_URL:-http://localhost:8005}
+        NG_PYTHON_URL: ${NG_PYTHON_URL:-http://localhost:8006}
     container_name: angular-health-monitor
     ports:
       # Must stay 4200 on the host: the backends only allow CORS from http://localhost:4200.

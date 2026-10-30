@@ -4,6 +4,16 @@ A technology integration lab: three single-page frontends that can each talk to 
 backends, each backend using a different database. Every project is independent and has its
 own dependencies and README.
 
+## Branches
+
+| Branch | Use |
+|--------|-----|
+| `local` | Run everything on your own machine (`http://localhost:...`). |
+| `main` | Deployment: adds HTTPS, one subdomain per app and closed database ports. See `DEPLOY.md` on that branch. |
+
+Make changes on `local`, then merge `local` into `main`. The two branches differ only in a few
+deployment files at the repository root, so merges stay clean.
+
 ## Structure
 
 ```
