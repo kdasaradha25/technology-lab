@@ -1,0 +1,47 @@
+# One HTTPS site per app. Caddy gets and renews a Let's Encrypt certificate for each name, so
+# DNS for ${DOMAIN} and *.${DOMAIN} must point at this server before the stack starts.
+
+{$DOMAIN} {
+	redir https://react.{$DOMAIN}{uri}
+}
+
+# ---- Frontends ----
+react.{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy react:80
+}
+
+nextjs.{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy nextjs:3000
+}
+
+angular.{$DOMAIN} {
+	encode zstd gzip
+	reverse_proxy angular:80
+}
+
+# ---- Backends ----
+django.{$DOMAIN} {
+	reverse_proxy django:8001
+}
+
+fastapi.{$DOMAIN} {
+	reverse_proxy fastapi:8002
+}
+
+express.{$DOMAIN} {
+	reverse_proxy express:8003
+}
+
+go.{$DOMAIN} {
+	reverse_proxy go:8004
+}
+
+php.{$DOMAIN} {
+	reverse_proxy php:8005
+}
+
+python.{$DOMAIN} {
+	reverse_proxy python:8006
+}

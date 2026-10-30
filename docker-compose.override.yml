@@ -1,0 +1,124 @@
+# Deployment settings for the `main` branch. `docker compose` loads this file automatically on
+# top of docker-compose.yml, so on a server the whole stack still starts with:
+#   docker compose up -d --build
+#
+# What it changes compared with the `local` branch:
+# - Caddy is the only container with public ports (80/443). It gets HTTPS certificates
+#   automatically and routes https://<app>.${DOMAIN} to each frontend and backend.
+# - No database or API port is published on the host (`!reset []`), so they are reachable only
+#   from inside the Docker network.
+# - Frontends are built with the public https://<backend>.${DOMAIN} URLs, and every backend
+#   allows CORS from the public frontend URLs.
+# - Every container restarts automatically after a crash or a server reboot.
+
+x-frontend-origins: &frontend-origins https://react.${DOMAIN},https://nextjs.${DOMAIN},https://angular.${DOMAIN}
+
+services:
+  caddy:
+    image: caddy:2.10-alpine
+    container_name: technology-lab-caddy
+    restart: unless-stopped
+    environment:
+      DOMAIN: ${DOMAIN:?Set DOMAIN in .env (see .env.example)}
+    ports:
+      - "80:80"
+      - "443:443"
+      - "443:443/udp"   # HTTP/3
+    volumes:
+      - ./deploy/Caddyfile:/etc/caddy/Caddyfile:ro
+      # Certificates live here; keeping them avoids hitting Let's Encrypt rate limits on restarts.
+      - caddy_data:/data
+      - caddy_config:/config
+
+  # ---- Databases: internal only ----
+  postgres:
+    restart: unless-stopped
+    ports: !reset []
+  mysql:
+    restart: unless-stopped
+    ports: !reset []
+  mongo:
+    restart: unless-stopped
+    ports: !reset []
+  cassandra:
+    restart: unless-stopped
+    ports: !reset []
+  redis:
+    restart: unless-stopped
+    ports: !reset []
+  influxdb:
+    restart: unless-stopped
+    ports: !reset []
+
+  # ---- Backends: reached through Caddy ----
+  django:
+    restart: unless-stopped
+    ports: !reset []
+    environment:
+      DJANGO_DEBUG: "False"
+      DJANGO_ALLOWED_HOSTS: django.${DOMAIN},localhost,127.0.0.1
+      CORS_ALLOWED_ORIGINS: *frontend-origins
+  fastapi:
+    restart: unless-stopped
+    ports: !reset []
+    environment:
+      CORS_ALLOWED_ORIGINS: *frontend-origins
+  express:
+    restart: unless-stopped
+    ports: !reset []
+    environment:
+      CORS_ALLOWED_ORIGINS: *frontend-origins
+  go:
+    restart: unless-stopped
+    ports: !reset []
+    environment:
+      CORS_ALLOWED_ORIGINS: *frontend-origins
+  php:
+    restart: unless-stopped
+    ports: !reset []
+    environment:
+      CORS_ALLOWED_ORIGINS: *frontend-origins
+  python:
+    restart: unless-stopped
+    ports: !reset []
+    environment:
+      CORS_ALLOWED_ORIGINS: *frontend-origins
+
+  # ---- Frontends: built with the public backend URLs ----
+  react:
+    restart: unless-stopped
+    ports: !reset []
+    build:
+      args:
+        VITE_DJANGO_URL: https://django.${DOMAIN}
+        VITE_FASTAPI_URL: https://fastapi.${DOMAIN}
+        VITE_EXPRESS_URL: https://express.${DOMAIN}
+        VITE_GO_URL: https://go.${DOMAIN}
+        VITE_PHP_URL: https://php.${DOMAIN}
+        VITE_PYTHON_URL: https://python.${DOMAIN}
+  nextjs:
+    restart: unless-stopped
+    ports: !reset []
+    build:
+      args:
+        NEXT_PUBLIC_DJANGO_URL: https://django.${DOMAIN}
+        NEXT_PUBLIC_FASTAPI_URL: https://fastapi.${DOMAIN}
+        NEXT_PUBLIC_EXPRESS_URL: https://express.${DOMAIN}
+        NEXT_PUBLIC_GO_URL: https://go.${DOMAIN}
+        NEXT_PUBLIC_PHP_URL: https://php.${DOMAIN}
+        NEXT_PUBLIC_PYTHON_URL: https://python.${DOMAIN}
+  angular:
+    restart: unless-stopped
+    ports: !reset []
+    build:
+      args:
+        NG_DJANGO_URL: https://django.${DOMAIN}
+        NG_FASTAPI_URL: https://fastapi.${DOMAIN}
+        NG_EXPRESS_URL: https://express.${DOMAIN}
+        NG_GO_URL: https://go.${DOMAIN}
+        NG_PHP_URL: https://php.${DOMAIN}
+        NG_PYTHON_URL: https://python.${DOMAIN}
+
+volumes:
+  caddy_data:
+  caddy_config:
